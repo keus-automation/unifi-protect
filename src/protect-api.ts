@@ -130,6 +130,11 @@ export class ProtectApi extends EventEmitter {
     this.password = "";
   }
 
+  getHeaders(): Headers {
+
+    return this.headers;
+  }
+
   /**
    * Execute a login attempt to the UniFi Protect API.
    *
