@@ -1,5 +1,5 @@
 {
-  "name": "unifi-protect",
+  "name": "@keus-automation/unifi-protect",
   "type": "module",
   "version": "4.11.1",
   "displayName": "UniFi Protect API",

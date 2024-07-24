@@ -1117,3 +1117,8 @@ export type ProtectViewerConfig = ProtectViewerConfigInterface;
 
 /** @see {@link ProtectViewerConfigInterface} */
 export type ProtectViewerConfigPayload = DeepPartial<ProtectViewerConfigInterface>;
+
+export enum PlaybackQuality {
+  LOW_QUALITY = 2,
+  HIGH_QUALITY = 0
+}

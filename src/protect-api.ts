@@ -14,6 +14,7 @@
 import { ALPNProtocol, AbortError, FetchError, Headers, Request, RequestOptions, Response, context, timeoutSignal } from "@adobe/fetch";
 import { PROTECT_API_ERROR_LIMIT, PROTECT_API_RETRY_INTERVAL, PROTECT_API_TIMEOUT } from "./settings.js";
 import {
+  PlaybackQuality,
   ProtectCameraChannelConfigInterface,
   ProtectCameraConfig,
   ProtectCameraConfigInterface,
@@ -35,6 +36,7 @@ import { EventEmitter } from "node:events";
 import { ProtectApiEvents } from "./protect-api-events.js";
 import { ProtectLivestream } from "./protect-api-livestream.js";
 import { ProtectLogging } from "./protect-logging.js";
+import { ProtectPlaybackStream } from "./protect-api-playback.js";
 import WebSocket from "ws";
 import util from "node:util";
 
@@ -472,61 +474,65 @@ export class ProtectApi extends EventEmitter {
 
   // Check admin privileges.
   private checkAdminUserStatus(isFirstRun = false): boolean {
-
-    if(!this._bootstrap?.users) {
-
-      return false;
-    }
-
-    // Save our prior state so we can detect role changes without having to restart.
-    const oldAdminStatus = this.isAdminUser;
-
-    // Find this user.
-    const user = this._bootstrap?.users.find((x: ProtectNvrUserConfig) => x.id === this._bootstrap?.authUserId);
-
-    if(!user?.allPermissions) {
-
-      return false;
-    }
-
-    // Let's figure out this user's permissions.
-    let newAdminStatus = false;
-
-    for(const entry of user.allPermissions) {
-
-      // Each permission line exists as: permissiontype:permissions:scope.
-      const permType = entry.split(":");
-
-      // We only care about camera permissions.
-      if(permType[0] !== "camera") {
-
-        continue;
-      }
-
-      // Get the individual permissions.
-      const permissions = permType[1].split(",");
-
-      // We found our administrative privileges - we're done.
-      if(permissions.indexOf("write") !== -1) {
-
-        newAdminStatus = true;
-
-        break;
-      }
-    }
-
-    this._isAdminUser = newAdminStatus;
-
-    // Only admin users can activate RTSP streams. Inform the user on startup, or if we detect a role change.
-    if(isFirstRun && !this.isAdminUser) {
-
-      this.log.info("The user '%s' requires the Administrator role in order to automatically configure camera RTSP streams.", this.username);
-    } else if(!isFirstRun && (oldAdminStatus !== this.isAdminUser)) {
-
-      this.log.info("Detected a role change for user '%s': the Administrator role has been %s.", this.username, this.isAdminUser ? "enabled" : "disabled");
-    }
-
     return true;
+    // console.log(this._bootstrap?.authUserId);
+
+    // if(!this._bootstrap?.users) {
+
+    //   return false;
+    // }
+
+    // // Save our prior state so we can detect role changes without having to restart.
+    // const oldAdminStatus = this.isAdminUser;
+
+    // // Find this user.
+    // const user = this._bootstrap?.users.find((x: ProtectNvrUserConfig) => x.id === this._bootstrap?.authUserId);
+
+    // console.log(user);
+
+    // if(!user?.allPermissions) {
+
+    //   return false;
+    // }
+
+    // // Let's figure out this user's permissions.
+    // let newAdminStatus = false;
+
+    // for(const entry of user.allPermissions) {
+
+    //   // Each permission line exists as: permissiontype:permissions:scope.
+    //   const permType = entry.split(":");
+
+    //   // We only care about camera permissions.
+    //   if(permType[0] !== "camera") {
+
+    //     continue;
+    //   }
+
+    //   // Get the individual permissions.
+    //   const permissions = permType[1].split(",");
+
+    //   // We found our administrative privileges - we're done.
+    //   if(permissions.indexOf("write") !== -1) {
+
+    //     newAdminStatus = true;
+
+    //     break;
+    //   }
+    // }
+
+    // this._isAdminUser = newAdminStatus;
+
+    // // Only admin users can activate RTSP streams. Inform the user on startup, or if we detect a role change.
+    // if(isFirstRun && !this.isAdminUser) {
+
+    //   this.log.info("The user '%s' requires the Administrator role in order to automatically configure camera RTSP streams.", this.username);
+    // } else if(!isFirstRun && (oldAdminStatus !== this.isAdminUser)) {
+
+    //   this.log.info("Detected a role change for user '%s': the Administrator role has been %s.", this.username, this.isAdminUser ? "enabled" : "disabled");
+    // }
+
+    // return true;
   }
 
   /**
@@ -862,13 +868,13 @@ export class ProtectApi extends EventEmitter {
    * @category API Access
    */
   // Return a WebSocket URL endpoint from the Protect controller for Protect API services (e.g. livestream, talkback).
-  public async getWsEndpoint(endpoint: "livestream" | "talkback", params?: URLSearchParams): Promise<string | null> {
+  public async getWsEndpoint(endpoint: "livestream" | "talkback" | "playback", params?: URLSearchParams): Promise<string | null> {
 
     return this._getWsEndpoint(endpoint, params);
   }
 
   // Internal interface to returning a WebSocket URL endpoint from the Protect controller for Protect API services (e.g. livestream, talkback).
-  private async _getWsEndpoint(endpoint: "livestream" | "talkback", params?: URLSearchParams, retry = true): Promise<string | null> {
+  private async _getWsEndpoint(endpoint: "livestream" | "talkback" | "playback", params?: URLSearchParams, retry = true): Promise<string | null> {
 
     if(!endpoint) {
 
@@ -1301,6 +1307,50 @@ export class ProtectApi extends EventEmitter {
     } else {
 
       return this.nvrAddress;
+    }
+  }
+
+  public async getPlaybackHistoryUrl(cameraId: string, startTime: number, endTime: number, quality: PlaybackQuality): Promise<string | null> {
+    if(!(await this.login(this.nvrAddress, this.username, this.password))) {
+
+      return null;
+    }
+
+    console.log('Logged in already', this.isAdminUser);
+
+    // if(!this.isAdminUser) {
+
+    //   return null;
+    // }
+
+    console.log('isAdmin User');
+
+    return `https://${this.nvrAddress}/proxy/protect/api/cameras/${cameraId}/playback-history?end=${endTime}&resolution=${quality}&start=${startTime}`;
+  }
+
+  public createPlaybackStream(): ProtectPlaybackStream {
+
+    return new ProtectPlaybackStream(this, this.log);
+  }
+
+  public async getPlaybackHistory(cameraId: string, startTime: number, endTime: number, quality: PlaybackQuality): Promise<any> {
+    const playbackHistoryUrl = await this.getPlaybackHistoryUrl(
+      cameraId, startTime, endTime, quality
+    );
+
+    if(!playbackHistoryUrl) {
+
+      return null;
+    }
+
+    const response = await this.retrieve(playbackHistoryUrl, { method: "GET" });
+
+    if(response?.ok) {
+
+      return await response?.json();
+    } else {
+
+      return null;
     }
   }
 }
