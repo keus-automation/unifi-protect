@@ -9,4 +9,4 @@ export type { ProtectPlaybackStream } from "./protect-api-playback.js";
 export { ProtectApiEvents, ProtectEventPacket } from "./protect-api-events.js";
 export * from "./protect-logging.js";
 export * from "./protect-types.js";
-export { FetchError } from "@adobe/fetch";
+export type { FetchError } from "@adobe/fetch";

@@ -11,7 +11,7 @@
  *
  * @module ProtectApi
  */
-import { ALPNProtocol, AbortError, FetchError, Headers, Request, RequestOptions, Response, context, timeoutSignal } from "@adobe/fetch";
+import type { Headers, Request, RequestOptions, Response } from "@adobe/fetch";
 import { PROTECT_API_ERROR_LIMIT, PROTECT_API_RETRY_INTERVAL, PROTECT_API_TIMEOUT } from "./settings.js";
 import {
   PlaybackQuality,
@@ -26,7 +26,6 @@ import {
   ProtectNvrBootstrap,
   ProtectNvrConfig,
   ProtectNvrConfigPayload,
-  ProtectNvrUserConfig,
   ProtectSensorConfig,
   ProtectSensorConfigPayload,
   ProtectViewerConfig,
@@ -39,6 +38,7 @@ import { ProtectLogging } from "./protect-logging.js";
 import { ProtectPlaybackStream } from "./protect-api-playback.js";
 import WebSocket from "ws";
 import util from "node:util";
+import { ES6Imports } from "./es6-importers.js";
 
 /**
  * Define our known Protect device types.
@@ -52,6 +52,9 @@ export type ProtectKnownDeviceTypes = ProtectCameraConfig | ProtectChimeConfig |
 export type ProtectKnownDevicePayloads = ProtectCameraConfigPayload | ProtectChimeConfigPayload | ProtectLightConfigPayload | ProtectNvrConfigPayload |
   ProtectSensorConfigPayload | ProtectViewerConfigPayload;
 
+export const InitUnifiProtectLibrary = async function() {
+  await ES6Imports.start();
+}
 /**
  * This class provides an event-driven API to access the UniFi Protect API. Here's how to quickly get up and running with this library once you've instantiated the class:
  *
@@ -119,8 +122,9 @@ export class ProtectApi extends EventEmitter {
 
     this.apiErrorCount = 0;
     this.apiLastSuccess = 0;
-    this.fetch = context({ alpnProtocols: [ ALPNProtocol.ALPN_HTTP2 ], rejectUnauthorized: false, userAgent: "unifi-protect" }).fetch;
-    this.headers = new Headers();
+    this.fetch = ES6Imports.AdobeFetch.context({
+      alpnProtocols: [ ES6Imports.AdobeFetch.ALPNProtocol.ALPN_HTTP2 ], rejectUnauthorized: false, userAgent: "unifi-protect" }).fetch;
+    this.headers = new ES6Imports.AdobeFetch.Headers();
     this.nvrAddress = "";
     this.username = "";
     this.password = "";
@@ -815,7 +819,7 @@ export class ProtectApi extends EventEmitter {
     const csrfToken = this.headers?.get("X-CSRF-Token");
 
     // Initialize the headers we need.
-    this.headers = new Headers();
+    this.headers = new ES6Imports.AdobeFetch.Headers();
     this.headers.set("Content-Type", "application/json");
 
     // Restore the CSRF token if we have one.
@@ -925,7 +929,7 @@ export class ProtectApi extends EventEmitter {
 
     } catch(error) {
 
-      if(error instanceof FetchError) {
+      if(error instanceof ES6Imports.AdobeFetch.FetchError) {
 
         switch(error.code) {
 
@@ -982,7 +986,7 @@ export class ProtectApi extends EventEmitter {
     let response: Response;
 
     // Create a signal handler to deliver the abort operation.
-    const signal = timeoutSignal(PROTECT_API_TIMEOUT);
+    const signal = ES6Imports.AdobeFetch.timeoutSignal(PROTECT_API_TIMEOUT);
 
     options.headers = this.headers;
     options.signal = signal;
@@ -1074,7 +1078,7 @@ export class ProtectApi extends EventEmitter {
 
       this.apiErrorCount++;
 
-      if(error instanceof AbortError) {
+      if(error instanceof ES6Imports.AdobeFetch.AbortError) {
 
         this.log.error("Protect controller is taking too long to respond to a request. This error can usually be safely ignored.");
         this.log.debug("Original request was: %s", url);
@@ -1082,7 +1086,7 @@ export class ProtectApi extends EventEmitter {
         return null;
       }
 
-      if(error instanceof FetchError) {
+      if(error instanceof ES6Imports.AdobeFetch.FetchError) {
 
         switch(error.code) {
 
