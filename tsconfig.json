@@ -2,9 +2,7 @@
   "compilerOptions": {
 
     "outDir": "dist",
-    "rootDir": "src",
-    "target": "ES2018",
-    "module": "CommonJS"
+    "rootDir": "src"
   },
 
   "extends": "./node_modules/homebridge-plugin-utils/build/tsconfig.json",
