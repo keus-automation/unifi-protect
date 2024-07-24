@@ -1,4 +1,4 @@
-[**unifi-protect**](README.md) • **Docs**
+[**@keus-automation/unifi-protect**](README.md) • **Docs**
 
 ***
 

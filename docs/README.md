@@ -1,4 +1,4 @@
-**unifi-protect** • **Docs**
+**@keus-automation/unifi-protect** • **Docs**
 
 ***
 
@@ -41,3 +41,4 @@ The UniFi Protect API is undocumented and implementing a library like this one i
 | [ProtectLivestream](ProtectLivestream.md) | Access a direct MP4 livestream for a UniFi Protect camera. |
 | [ProtectLogging](ProtectLogging.md) | Logging interface for this library that you can optionally specify. |
 | [ProtectTypes](ProtectTypes.md) | A semi-complete description of all the object types used by the UniFi Protect API. |
+| [protect-api-playback](protect-api-playback.md) | - |

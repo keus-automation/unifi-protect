@@ -1,4 +1,4 @@
-[**unifi-protect**](README.md) • **Docs**
+[**@keus-automation/unifi-protect**](README.md) • **Docs**
 
 ***
 
@@ -16,6 +16,17 @@ partial, for patching the configuration objects and receiving event updates rela
 
 - We append **Config** to the primary version of a device configuration object.
 - We append **Payload** to the version of a device configuration object that can have partial components of the object in it, used for patching or updates.
+
+## Enumerations
+
+### PlaybackQuality
+
+#### Enumeration Members
+
+| Enumeration Member | Value |
+| :------ | :------ |
+| `HIGH_QUALITY` | `0` |
+| `LOW_QUALITY` | `2` |
 
 ## Interfaces
 

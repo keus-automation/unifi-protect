@@ -1,4 +1,4 @@
-[**unifi-protect**](README.md) • **Docs**
+[**@keus-automation/unifi-protect**](README.md) • **Docs**
 
 ***
 
@@ -242,7 +242,7 @@ Return a websocket API endpoint for the requested endpoint type.
 
 | Parameter | Type | Description |
 | :------ | :------ | :------ |
-| `endpoint` | `"livestream"` \| `"talkback"` | Requested endpoint type. Valid types are `livestream` and `talkback`. |
+| `endpoint` | `"playback"` \| `"livestream"` \| `"talkback"` | Requested endpoint type. Valid types are `livestream` and `talkback`. |
 | `params`? | `URLSearchParams` | Parameters to pass on for the endpoint request. |
 
 ###### Returns
@@ -510,6 +510,64 @@ Clear the login credentials and terminate any open connection to the UniFi Prote
 ###### Returns
 
 `void`
+
+#### Other
+
+##### createPlaybackStream()
+
+```ts
+createPlaybackStream(): ProtectPlaybackStream
+```
+
+###### Returns
+
+[`ProtectPlaybackStream`](protect-api-playback.md#protectplaybackstream)
+
+##### getPlaybackHistory()
+
+```ts
+getPlaybackHistory(
+   cameraId, 
+   startTime, 
+   endTime, 
+quality): Promise<any>
+```
+
+###### Parameters
+
+| Parameter | Type |
+| :------ | :------ |
+| `cameraId` | `string` |
+| `startTime` | `number` |
+| `endTime` | `number` |
+| `quality` | [`PlaybackQuality`](ProtectTypes.md#playbackquality) |
+
+###### Returns
+
+`Promise`\<`any`\>
+
+##### getPlaybackHistoryUrl()
+
+```ts
+getPlaybackHistoryUrl(
+   cameraId, 
+   startTime, 
+   endTime, 
+quality): Promise<null | string>
+```
+
+###### Parameters
+
+| Parameter | Type |
+| :------ | :------ |
+| `cameraId` | `string` |
+| `startTime` | `number` |
+| `endTime` | `number` |
+| `quality` | [`PlaybackQuality`](ProtectTypes.md#playbackquality) |
+
+###### Returns
+
+`Promise`\<`null` \| `string`\>
 
 ## Type Aliases
 
