@@ -523,6 +523,16 @@ createPlaybackStream(): ProtectPlaybackStream
 
 [`ProtectPlaybackStream`](protect-api-playback.md#protectplaybackstream)
 
+##### getHeaders()
+
+```ts
+getHeaders(): Headers
+```
+
+###### Returns
+
+`Headers`
+
 ##### getPlaybackHistory()
 
 ```ts
@@ -600,3 +610,15 @@ type ProtectKnownDeviceTypes:
 ```
 
 Define our known Protect device types.
+
+## Functions
+
+### InitUnifiProtectLibrary()
+
+```ts
+function InitUnifiProtectLibrary(): Promise<void>
+```
+
+#### Returns
+
+`Promise`\<`void`\>

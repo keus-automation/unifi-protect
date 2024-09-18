@@ -495,10 +495,13 @@ export class ProtectApi extends EventEmitter {
     // Find this user.
     // const user = this.bootstrap?.users.find((x: ProtectNvrUserConfig) => x.id === this.bootstrap?.authUserId);
     let user: ProtectNvrUserConfig | undefined;
-    for (const x of this.bootstrap?.users) {
-      if (x.id === this.bootstrap.authUserId) {
-        user = x;
-        break;
+
+    if(this.bootstrap !== null){
+      for(const x of this.bootstrap.users){
+        if(x.id === this.bootstrap.authUserId){
+          user = x;
+          break;
+        }
       }
     }
 
